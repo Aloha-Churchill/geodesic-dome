@@ -1,7 +1,7 @@
 /*
 TODO
 - Add parameters to GUI
-- Twisted torus
+- Twisted SURFACE_FUNCTION
 - Add color to points based on rate of change (euclidean distance? no
     actually probably distance along the curve but can be approxed from last position) -- this way we 
 can visualize curvature of surfaces
@@ -55,21 +55,60 @@ function sphere(u, v, target) {
     target.set( x, y, z );
 }
 
+function cylinder(u, v, target) {
+    u *= 2* Math.PI;
+    v *= 2 * Math.PI;
+    const x = Math.cos( u );
+    const y = Math.sin( u );
+    const z = u;
+    target.set( x, y, z );
+
+}
+
+function hyperbolic_paraboloid(u, v, target) {
+    u *= 2* Math.PI;
+    v *= 2 * Math.PI;
+    const x = u;
+    const y = v;
+    const z = u * v;
+    target.set( x, y, z );
+}
+
+function butterfly_curve(theta, theta2, target) {
+    theta *= 2*Math.PI;
+    theta2 *= 2 * Math.PI;
+    const x = Math.sin(theta) * (Math.exp(Math.cos(theta)) - 2 * Math.cos(4 * theta) - Math.pow(Math.sin(theta/12), 5));
+    const y = Math.cos(theta) * (Math.exp(Math.cos(theta)) - 2 * Math.cos(4 * theta) - Math.pow(Math.sin(theta/12), 5));
+    const z = Math.pow(Math.sin(theta/2), 3);
+    target.set( x, y, z );
+}
+
+function twisted_torus(u, v, target) {
+    u *= 4* Math.PI;
+    v *= 2 * Math.PI;
+    const x = Math.sin(u) + 2* Math.sin(2*u);
+    const y = Math.cos(u) - 2* Math.cos(2*u);
+    const z = -Math.sin(3*u);
+    target.set( x, y, z );
+}
+
 let phase = 0;
 let speed = 0.001;
 function torus(u, v, target) {
     phase += speed;
-    u = (u+phase) * 2* Math.PI;
+    u = 2* Math.PI;
     v *= 2 * Math.PI;
     const x = (2 + Math.cos(v)) * Math.cos(u);
     const y = (2 + Math.cos(v)) * Math.sin(u);
-    const z = Math.sin(v);
+    const z = Math.cos(v);
     target.set( x, y, z );
 }
 
+
 const N_SLICES = 100;
 const N_STACKS = 100;
-const geometry = new ParametricGeometry( torus, N_SLICES, N_STACKS);
+let SURFACE_FUNCTION = twisted_torus;
+const geometry = new ParametricGeometry( SURFACE_FUNCTION, N_SLICES, N_STACKS);
 const material = new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } );
 
 
@@ -93,7 +132,7 @@ scene.add(points);
 const mesh = new THREE.Points( geometry, material );
 scene.add( mesh );
 
-camera.position.z = 5;
+camera.position.z = 15;
 
 // let arrow;
 // let arrows = [];
@@ -131,9 +170,9 @@ function animate() {
     // }
 
     // new_u, new_v = uvs[animation_iteration][0], uvs[animation_iteration][1];
-    // create_arrow(new_u, new_v, torus);
+    // create_arrow(new_u, new_v, SURFACE_FUNCTION);
     points.geometry.dispose();
-    points.geometry = new ParametricGeometry( torus, N_SLICES, N_STACKS);
+    points.geometry = new ParametricGeometry( SURFACE_FUNCTION, N_SLICES, N_STACKS);
     
     const numVertices = geometry.attributes.position.count;
     const colors = new Float32Array(numVertices * 3);
