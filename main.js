@@ -95,6 +95,7 @@ function init() {
     // Add toggle for xyz axes
     helpers = new THREE.AxesHelper(5);
     gui.add(params, 'showHelpers').name('show helpers').onChange(onParamsChange);
+    
     // Add faces, lines, and points toggles
     gui.add(params, 'drawFaces').name('draw faces').onChange(onParamsChange);
     gui.add(params, 'drawEdges').name('draw edges').onChange(onParamsChange);
